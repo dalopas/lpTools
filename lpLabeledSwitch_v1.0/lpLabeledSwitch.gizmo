@@ -1,0 +1,75 @@
+Group {
+ name lpLabeledSwitch
+ tile_color 0xff5f00ff
+ note_font "Segoe UI Black"
+help "This is just a Switch with style changeable labels!"
+knobChanged "\n\nthis_node = nuke.thisNode()\nthis_knob = nuke.thisKnob()\n\n###################################################################\n# Handling incorrect SWITCH.\n###################################################################\nif this_node.knob('switch').value() >= this_node.knob('nLabels').value():\n    nuke.message(\"<b>ERROR!<br><br><center>You cant' Switch between a numer higher than the number of labels\")\nelif this_node.knob('switch').value() < 0:\n     nuke.message(\"<b>ERROR!<br><br><center>You cant' Switch in negative numbers\")\n\n###################################################################\n# Handling incorrect FONT SIZE.\n###################################################################\nelif \"fontSize_\" in this_knob.name():\n    if this_knob.value() > this_node.knob('note_font_size').value():\n        this_node.knob('fontsizeWarning').setVisible(True)\n    else:\n        this_node.knob('fontsizeWarning').setVisible(False)\n\n"
+tile_color 0xff5f00ff
+label "\[if \{\[value this.switch]==1\} \{return \"<font color=\[string map \{\"0x\" \"#\"\} \" \[string range \"\[value this.fontColor_1]\" 0 end-2]\"] face='\[python \{nuke.thisNode().knob('font_1').getValue()\[0]\}]' size='\[value this.fontSize_1]'><center>\[value this.label_1]</font>\"\}]\n\[if \{\[value this.switch]==0\} \{return \"<font color=\[string map \{\"0x\" \"#\"\} \" \[string range \"\[value this.fontColor_0]\" 0 end-2]\"] face='\[python \{nuke.thisNode().knob('font_0').getValue()\[0]\}]' size='\[value this.fontSize_0]'><center>\[value this.label_0]</font>\"\}]\n\n\[if \{\[value this.switch]>=\[value this.nLabels]\} \{return \"<font color=#881818><center><b>ERROR!<br><br>You cant' Switch between a numer higher than the number of labels\"\}]\n\[if \{\[value this.switch]<0\} \{return \"<font color=#881818><center><b>ERROR!<br><br>You cant' Switch in negative numbers\"\}]\n"
+note_font "MS Shell Dlg 2 Bold"
+selected true
+xpos 679
+ypos 200
+addUserKnob {20 lpLabeledSwitch}
+addUserKnob {3 switch l "Select Which"}
+switch 1
+addUserKnob {26 fontsizeWarning l "" +STARTLINE +HIDDEN T "<font color=#881818><b><br>You shouldn't set any Font Size value higher than the actual Font Size of the Node.<br>It wont't change unless you set the Font Size of the Node higher. <br><br>SORRY, this is how Nuke works!"}
+addUserKnob {26 line_switch l "" +STARTLINE}
+addUserKnob {1 label_0 l "Label 0"}
+label_0 LIVE
+addUserKnob {84 font_0 l "Font 0"}
+font_0 {{ Impact : Regular : impact.ttf : 0 }}
+addUserKnob {3 fontSize_0 l "" -STARTLINE}
+fontSize_0 11
+addUserKnob {40 fontColor_0 l "Font Color 0" -STARTLINE}
+fontColor_0 0xff0000ff
+addUserKnob {26 line_0 l "" +STARTLINE}
+addUserKnob {1 label_1 l "Label 1"}
+label_1 PRECOMP
+addUserKnob {84 font_1 l "Font 1"}
+font_1 {{ Franklin Gothic Medium : Regular : framd.ttf : 0 }}
+addUserKnob {3 fontSize_1 l "" -STARTLINE}
+fontSize_1 5
+addUserKnob {40 fontColor_1 l "Font Color 1" -STARTLINE}
+fontColor_1 0x1fff00ff
+addUserKnob {26 line_1 l "" +STARTLINE}
+addUserKnob {22 addLabel l "<b>Add Label<b>" T "###################################################################\n###################################################################\n###################################################################\n\ndef addLabel():\n\n    ###################################################################\n    # Getting Node and number of labels (nLabels).\n    ###################################################################\n    \n    # Get actual Node.\n    node = nuke.thisNode()\n    # node = nuke.toNode('lpLabeledSwitch_1')\n    \n    # Get and save value of the nuber of labels. \n    # To name knobs and to rebuild the nLabels Int Knob later.\n    nLabels = int(node.knob('nLabels').getValue())\n\n    # Get and save value of the original label in the node. \n    # To just add the line of the new one.\n    originalLabel = str(node.knob('label').getValue())\n    \n    \n    ###################################################################\n    # Cleanup of bottom of the node.\n    ###################################################################\n    \n    # Deleting AddLabel Button \n    node.removeKnob(node.knob('addLabel'))\n    \n    # Deleting nLabels Int Knob\n    node.removeKnob(node.knob('nLabels'))\n    \n    # Deleting Node and Copy names Divider Line, and Texts\n    node.removeKnob(node.knob('line_' + str(nLabels)))\n    \n    node.removeKnob(node.knob('nodeName'))\n    node.removeKnob(node.knob('copyName'))\n    \n    \n    ###################################################################\n    # Creating Label.\n    ###################################################################\n    \n    # Creating Label Name Input\n    knob = nuke.String_Knob('label_' + str(nLabels), 'Label '  + str(nLabels))\n    knob.setText('label '  + str(nLabels))\n    node.addKnob(knob)\n        \n    # Creating Label Font\n    knob = nuke.FreeType_Knob('font_'  + str(nLabels), 'Font '  + str(nLabels))\n    node.addKnob(knob)\n        \n    # Creating Label Font Size\n    knob = nuke.Int_Knob('fontSize_'  + str(nLabels), '')\n    node.addKnob(knob)\n    \n    # Creating Label Font Color\n    knob = nuke.ColorChip_Knob('fontColor_'  + str(nLabels),'Font Color '  + str(nLabels))\n    node.addKnob(knob)\n        \n    # Creating Label Divider Line\n    knob = nuke.Text_Knob('line_'  + str(nLabels), '')\n    node.addKnob(knob)\n    \n    \n    #################################################################\n    # Reconstructing bottom of the node.\n    #################################################################\n    \n    # Reconstructing AddLabel Button \n    knob = nuke.PyScript_Knob('addLabel', '<b>Add Label<b>', \"\"\"addLabel()\"\"\")\n    node.addKnob(knob)\n    \n    # Reconstructing nLabels Int Knob\n    knob = nuke.Int_Knob('nLabels', 'nLabels')\n    node.addKnob(knob)\n    knob.setValue(nLabels+1)\n    knob.setVisible(False)\n    \n    # Reconstructing Node and Copy names Divider Line\n    knob = nuke.Text_Knob('line_'  + str(nLabels+1), '')\n    node.addKnob(knob)\n    \n    knob = nuke.Text_Knob('nodeName', '')\n    node.addKnob(knob)\n    knob.setValue(' <b>lpLabeledSwitch v0.6</b>')\n    \n    knob = nuke.Text_Knob('copyName', '')\n    node.addKnob(knob)\n    knob.setValue('David Lozano Pascual ©')\n       \n    # Adding new Input to Internal Switch.\n    node.begin()\n    newInput = nuke.createNode('Input')\n    groupSwitch = nuke.toNode('Switch1999')\n    groupSwitch.setInput(nLabels, newInput)\n    node.end()\n    \n    # Reconstructing Node's label.\n    newLabel = \"\"\"\[if \{\[value this.switch]==\"\"\"  + str(nLabels) + \"\"\"\} \{return \"<font color=\[string map \{\"0x\" \"#\"\} \" \[string range \"\[value this.fontColor_\"\"\"  + str(nLabels) + \"\"\"]\" 0 end-2]\"] face='\[python \{nuke.thisNode().knob('font_\"\"\"  + str(nLabels) + \"\"\"').getValue()\[0]\}]' size='\[value this.fontSize_\"\"\"  + str(nLabels) + \"\"\"]'><center>\[value this.label_\"\"\"  + str(nLabels) + \"\"\"]</font>\"\}]\"\"\"\n    node.knob('label').setValue(newLabel + \"\"\"\\n\"\"\" + originalLabel)\n\n\n    # Maintain Node selected.\n    nuke.show(node)\n    \naddLabel()\n\n\n###################################################################\n###################################################################\n###################################################################" +STARTLINE}
+addUserKnob {3 nLabels +INVISIBLE}
+nLabels 2
+addUserKnob {26 line_2 l "" +STARTLINE}
+addUserKnob {26 nodeName l "" +STARTLINE T " <b>lpLabeledSwitch v0.6</b>"}
+addUserKnob {26 copyName l "" +STARTLINE T "David Lozano Pascual ©"}
+}
+Input {
+inputs 0
+name Input1
+xpos -97
+ypos -137
+}
+Dot {
+name Dot1
+xpos -63
+ypos -47
+}
+Input {
+inputs 0
+name Input0
+xpos 13
+ypos -139
+number 1
+}
+Switch {
+inputs 2
+which {{switch}}
+name Switch1999
+label "\[value which]"
+note_font "Verdana Bold"
+xpos 13
+ypos -57
+}
+Output {
+name Output1
+xpos 13
+ypos -25
+}
+end_group

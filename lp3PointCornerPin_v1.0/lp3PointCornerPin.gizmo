@@ -1,0 +1,179 @@
+Group {
+name lp3PointCornerPin
+tile_color 0xff5f00ff
+note_font "Segoe UI Black"
+addUserKnob {20 lp3PointCornerPin}
+addUserKnob {26 order_label l "" +STARTLINE T "<b><i>Order to follow on tracker:"}
+addUserKnob {26 order_text l "" +STARTLINE T "1\t2\n|\t|\n|\t|\n|\t|\n4 \t3"}
+addUserKnob {26 guide_space l "" +STARTLINE T " "}
+addUserKnob {26 bake_point_separator l "<b>Baking Point</b>"}
+addUserKnob {4 missing_point l "Missing point" M {1 2 3 4 "" "" "" ""}}
+missing_point 4
+addUserKnob {41 tracks l "" +STARTLINE T ThreePointCornerPinTracker1.tracks}
+addUserKnob {41 add_track l "add track" T ThreePointCornerPinTracker1.add_track}
+addUserKnob {41 del_tracks l "delete tracks" -STARTLINE T ThreePointCornerPinTracker1.del_tracks}
+addUserKnob {41 select_all l "select all" -STARTLINE T ThreePointCornerPinTracker1.select_all}
+addUserKnob {41 average_tracks l "average tracks" -STARTLINE T ThreePointCornerPinTracker1.average_tracks}
+addUserKnob {22 bake_point l "<b>Bake Point" T "import nuke\n\n\nthis_node = nuke.thisNode()\nmissing_point = int(this_node\['missing_point'].getValue())\n\n\n\nwith this_node:\n    \n    tracker = nuke.toNode('ThreePointCornerPinTracker1')\n    # tracker\['add_track'].execute()\n\n    # tracker = nuke.toNode('ThreePointCornerPinTracker1')\n    # tracker\['add_track'].execute()\n    \n\n    # count available tracks\n    # PAKO IOPUTA TE KIERO ILLO\n    n_tracks = 0\n\n    while tracker.knob('tracks').isAnimated(31 * n_tracks + 2):\n        n_tracks += 1   \n        \n    if n_tracks == 4:  \n        framesAsk = nuke.getFramesAndViews('bake curves in selected nodes?', '%s-%s' % (nuke.root().firstFrame(), nuke.root().lastFrame()))\n\n        if not framesAsk:\n            nuke.message(\"Didn't you wanted to bake it? <br> .________.\")\n        \n        else: \n            fRange = nuke.FrameRange(framesAsk\[0])\n    \n            # tracker = nuke.toNode('ThreePointCornerPinTracker1')\n            # tracker.knob('add_track').execute()  \n            tracks = tracker\['tracks']\n            tracks.setValue(1, 6 + 31 * 3)\n        \n            for frame in xrange(fRange.first(), fRange.last(), 1 ):\n                \n                 \n                # GETTING X, Y\n                # tracks.value(column + 31 * row)\n                tracker_1 = \[tracks.getValueAt(frame, 2 + 31 * 0), tracks.getValueAt(frame, 3 + 31 * 0)]\n                tracker_2 = \[tracks.getValueAt(frame, 2 + 31 * 1), tracks.getValueAt(frame, 3 + 31 * 1)]\n                tracker_3 = \[tracks.getValueAt(frame, 2 + 31 * 2), tracks.getValueAt(frame, 3 + 31 * 2)]\n                tracker_4 = \[]\n            \n                # 1    2\n                # |    |\n                # |    |\n                # 4    3\n            \n                # CASE 0 -> MISSING POINT 1\n                # X -> 2.track_x - (3.track_x - 4.track_x) -> WITH ONLY 3 -> 1.track_x - (2.track_x - 3.track_x)\n                # Y -> 4.track_y + (2.track_y - 3.track_y) -> WITH ONLY 3 -> 3.track_y + (1.track_y - 2.track_y)\n                if missing_point == 0:\n                    tracker_4 = \[tracker_1\[0] - (tracker_2\[0] - tracker_3\[0]), tracker_3\[1] + (tracker_1\[1] - tracker_2\[1])]\n            \n                    \n                # CASE 1 -> MISSING POINT 2\n                # X -> 1.track_x + (3.track_x - 4.track_x) -> WITH ONLY 3 -> 1.track_x + (2.track_x - 3.track_x)\n                # Y -> 3.track_y + (1.track_y - 4.track_y) -> WITH ONLY 3 -> 2.track_y + (1.track_y - 3.track_y)\n                elif missing_point == 1:\n                    tracker_4 = \[tracker_1\[0] + (tracker_2\[0] - tracker_3\[0]), tracker_2\[1] + (tracker_1\[1] - tracker_3\[1])]\n            \n            \n                # CASE 2 -> MISSING POINT 3\n                # X -> 4.track_x + (2.track_x - 1.track_x) -> WITH ONLY 3 -> 3.track_x + (2.track_x - 1.track_x)\n                # Y -> 2.track_y - (1.track_y - 4.track_y) -> WITH ONLY 3 -> 2.track_y - (1.track_y - 3.track_y)\n                elif missing_point == 2:\n                    tracker_4 = \[tracker_3\[0] + (tracker_2\[0] - tracker_1\[0]), tracker_2\[1] - (tracker_1\[1] - tracker_3\[1])]\n            \n            \n                # CASE 3 -> MISSING POINT 4\n                # X -> 3.track_x - (2.track_x - 1.track_x)\n                # Y -> 1.track_y - (2.track_y - 3.track_y)\n                elif missing_point == 3:\n                    tracker_4 = \[tracker_3\[0] - (tracker_2\[0] - tracker_1\[0]), tracker_1\[1] - (tracker_2\[1] - tracker_3\[1])]\n               \n                          \n                tracks.setValueAt(tracker_4\[0], frame, 2 + 31 * 3)\n                tracks.setValueAt(tracker_4\[1], frame, 3 + 31 * 3)\n    \n        \n    elif n_tracks < 4:\n        nuke.message(\"Oooops! You need the 4th tracker added although it won't have data! <br> I know... but nuke doesn't help sometimes... <br> .___.\")\n    \n    elif n_tracks > 4:\n        nuke.message(\"Oooops! You have more than 4 TRACKERS! So weird, this shouldn't happen... <br> .___.\")\n    \n    else: \n        nuke.message(\"Oooops! SOMETHING HAPPENED! <br> .___.\")" +STARTLINE}
+addUserKnob {26 bake_point_space l "" +STARTLINE T " "}
+addUserKnob {26 ref_frame_separator l "<b>Ref. Frame</b>"}
+addUserKnob {3 tracker_ref_frame l ref_frame}
+tracker_ref_frame 1001
+addUserKnob {22 set_tracker_ref_frame l "set to current frame" -STARTLINE T "this_node = nuke.thisNode()\ncurr_frame = nuke.frame()\nthis_node\['ref_frame'].setValue(curr_frame)\nthis_node\['tracker_ref_frame'].setValue(curr_frame)"}
+addUserKnob {26 ref_frame_space l "" +STARTLINE T " "}
+addUserKnob {26 _1 l <b>Export</b>}
+addUserKnob {41 cornerPinOptions l " " T ThreePointCornerPinTracker1.cornerPinOptions}
+addUserKnob {41 createCornerPin l create -STARTLINE T ThreePointCornerPinTracker1.createCornerPin}
+addUserKnob {26 ""}
+addUserKnob {26 nodeName l "" +STARTLINE T " <b>lp3PointCornerPin v0.1</b>"}
+addUserKnob {26 copyName l "" +STARTLINE T "David Lozano Pascual ©"}
+addUserKnob {20 settings_tab l Settings}
+addUserKnob {26 "" l <b>General</b>}
+addUserKnob {41 channels l "track channels" T ThreePointCornerPinTracker1.channels}
+addUserKnob {41 pretrack_filter l "pre-track filter" T ThreePointCornerPinTracker1.pretrack_filter}
+addUserKnob {41 adjust_for_luminance_changes l "adjust for luminance changes" T ThreePointCornerPinTracker1.adjust_for_luminance_changes}
+addUserKnob {41 max_iter l "max iterations" T ThreePointCornerPinTracker1.max_iter}
+addUserKnob {41 epsilon l "epsilon / resolution" T ThreePointCornerPinTracker1.epsilon}
+addUserKnob {41 max_error T ThreePointCornerPinTracker1.max_error}
+addUserKnob {41 clamp_footage l "clamp super-white, sub-zero footage" T ThreePointCornerPinTracker1.clamp_footage}
+addUserKnob {41 show_error_on_track_link l "show error on track paths" T ThreePointCornerPinTracker1.show_error_on_track_link}
+addUserKnob {41 hide_progress_bar l "hide progress bar" T ThreePointCornerPinTracker1.hide_progress_bar}
+addUserKnob {41 snap_to_markers l "snap to markers" T ThreePointCornerPinTracker1.snap_to_markers}
+addUserKnob {41 zoom_window_behaviour l "show zoom window" T ThreePointCornerPinTracker1.zoom_window_behaviour}
+addUserKnob {41 zoom_window_size l "zoom size / mag." T ThreePointCornerPinTracker1.zoom_window_size}
+addUserKnob {41 zoom_magnification_size l "" -STARTLINE T ThreePointCornerPinTracker1.zoom_magnification_size}
+addUserKnob {41 zoom_window_filter_behaviour l "zoom window filter" T ThreePointCornerPinTracker1.zoom_window_filter_behaviour}
+addUserKnob {20 Auto-Tracking n 1}
+Auto-Tracking 0
+addUserKnob {41 predict_track l "predict track" -STARTLINE T ThreePointCornerPinTracker1.predict_track}
+addUserKnob {41 warp l "warp type" T ThreePointCornerPinTracker1.warp}
+addUserKnob {41 grab_behaviour l "pattern grab behaviour" T ThreePointCornerPinTracker1.grab_behaviour}
+addUserKnob {41 grab_interval l "every n frames" T ThreePointCornerPinTracker1.grab_interval}
+addUserKnob {41 grab_error_above l "when error > " T ThreePointCornerPinTracker1.grab_error_above}
+addUserKnob {41 grab_error_below l "when error < " T ThreePointCornerPinTracker1.grab_error_below}
+addUserKnob {41 auto_regrab_pattern l "when tracking is stopped" T ThreePointCornerPinTracker1.auto_regrab_pattern}
+addUserKnob {41 regrab_when_offset l "when tracker is moved" T ThreePointCornerPinTracker1.regrab_when_offset}
+addUserKnob {20 "" n -1}
+addUserKnob {20 "Keyframe Tracking" n 1}
+"Keyframe Tracking" 0
+addUserKnob {41 retrack_on_move l "re-track when keyframe is moved / created" T ThreePointCornerPinTracker1.retrack_on_move}
+addUserKnob {41 create_key_on_move l "create new key when track is moved" T ThreePointCornerPinTracker1.create_key_on_move}
+addUserKnob {41 autotracks_delete_keyframes l "auto-tracks delete keyframes" T ThreePointCornerPinTracker1.autotracks_delete_keyframes}
+addUserKnob {41 keyframe_display l "keyframe display" T ThreePointCornerPinTracker1.keyframe_display}
+addUserKnob {41 keyframe_size l "keyframe size" T ThreePointCornerPinTracker1.keyframe_size}
+addUserKnob {41 max_number_of_keyframe_tracks_to_display l "on-screen key-track limit" T ThreePointCornerPinTracker1.max_number_of_keyframe_tracks_to_display}
+addUserKnob {20 "" n -1}
+addUserKnob {20 transform_tab l Transform}
+addUserKnob {41 transform T ThreePointCornerPinTracker1.transform}
+addUserKnob {3 ref_frame}
+ref_frame 1001
+addUserKnob {22 set_ref_frame l "set to current frame" -STARTLINE T "this_node = nuke.thisNode()\ncurr_frame = nuke.frame()\nthis_node\['ref_frame'].setValue(curr_frame)\nthis_node\['tracker_ref_frame'].setValue(curr_frame)"}
+addUserKnob {41 jitter_period l "jitter period" T ThreePointCornerPinTracker1.jitter_period}
+addUserKnob {41 smoothT l "smooth t" T ThreePointCornerPinTracker1.smoothT}
+addUserKnob {41 smoothR l r -STARTLINE T ThreePointCornerPinTracker1.smoothR}
+addUserKnob {41 smoothS l s -STARTLINE T ThreePointCornerPinTracker1.smoothS}
+addUserKnob {41 livelink_transform l "live-link transform" T ThreePointCornerPinTracker1.livelink_transform}
+addUserKnob {41 translate T ThreePointCornerPinTracker1.translate}
+addUserKnob {41 rotate T ThreePointCornerPinTracker1.rotate}
+addUserKnob {41 scale T ThreePointCornerPinTracker1.scale}
+addUserKnob {41 skewX l "skew X" T ThreePointCornerPinTracker1.skewX}
+addUserKnob {41 skewY l "skew Y" T ThreePointCornerPinTracker1.skewY}
+addUserKnob {41 skew_order l "skew order" T ThreePointCornerPinTracker1.skew_order}
+addUserKnob {41 center T ThreePointCornerPinTracker1.center}
+addUserKnob {41 filter T ThreePointCornerPinTracker1.filter}
+addUserKnob {41 clamp -STARTLINE T ThreePointCornerPinTracker1.clamp}
+addUserKnob {41 black_outside l "black outside" -STARTLINE T ThreePointCornerPinTracker1.black_outside}
+addUserKnob {41 motionblur T ThreePointCornerPinTracker1.motionblur}
+addUserKnob {41 shutter T ThreePointCornerPinTracker1.shutter}
+addUserKnob {41 shutteroffset l "shutter offset" T ThreePointCornerPinTracker1.shutteroffset}
+addUserKnob {41 shuttercustomoffset l "" -STARTLINE T ThreePointCornerPinTracker1.shuttercustomoffset}
+}
+Input {
+inputs 0
+name src
+xpos 0
+}
+Tracker4 {
+tracks { { 1 31 3 } 
+{ { 5 1 20 enable e 1 } 
+{ 3 1 75 name name 1 } 
+{ 2 1 58 track_x track_x 1 } 
+{ 2 1 58 track_y track_y 1 } 
+{ 2 1 63 offset_x offset_x 1 } 
+{ 2 1 63 offset_y offset_y 1 } 
+{ 4 1 27 T T 1 } 
+{ 4 1 27 R R 1 } 
+{ 4 1 27 S S 1 } 
+{ 2 0 45 error error 1 } 
+{ 1 1 0 error_min error_min 1 } 
+{ 1 1 0 error_max error_max 1 } 
+{ 1 1 0 pattern_x pattern_x 1 } 
+{ 1 1 0 pattern_y pattern_y 1 } 
+{ 1 1 0 pattern_r pattern_r 1 } 
+{ 1 1 0 pattern_t pattern_t 1 } 
+{ 1 1 0 search_x search_x 1 } 
+{ 1 1 0 search_y search_y 1 } 
+{ 1 1 0 search_r search_r 1 } 
+{ 1 1 0 search_t search_t 1 } 
+{ 2 1 0 key_track key_track 1 } 
+{ 2 1 0 key_search_x key_search_x 1 } 
+{ 2 1 0 key_search_y key_search_y 1 } 
+{ 2 1 0 key_search_r key_search_r 1 } 
+{ 2 1 0 key_search_t key_search_t 1 } 
+{ 2 1 0 key_track_x key_track_x 1 } 
+{ 2 1 0 key_track_y key_track_y 1 } 
+{ 2 1 0 key_track_r key_track_r 1 } 
+{ 2 1 0 key_track_t key_track_t 1 } 
+{ 2 1 0 key_centre_offset_x key_centre_offset_x 1 } 
+{ 2 1 0 key_centre_offset_y key_centre_offset_y 1 } 
+} 
+{ 
+ { {curve K x1014 1} "track 1" {curve x1001 376.4109192 377.8596497 378.3162537 378.9966431 379.9667969 379.4176331 379.7668762 379.7637024 379.4918213 379.1740417 379.2110291 379.2161865 378.0575562 377.6000061 377.6965332 379.2962341 382.8077698 386.7902832 389.7460938 394.7557373 402.8733826 408.4616699 410.5978699 412.04422 409.8181763 403.459198 398.3288879 397.6368103 399.9020996 397.8743591 395.2237854 396.1459045 399.7217407 409.8874207 422.5986633 431.4095764 437.2460938 442.1878052 440.6637573 434.2802734 430.8812866 428.1618652 426.5554199 427.6429138 428.9542847 428.2494812 422.2725525 415.690033 411.757782 413.8974304 418.284729 420.7323303 421.9608459 422.2193298 421.1198425 419.8271484 418.3936768 416.7444763 416.6766357 417.8026123 417.3306885 416.9068909 417.9393616 419.4631042 420.2582092 420.1440735 418.9505615 418.080658 417.9503784 419.1955566 420.3424377 420.5705872 419.9066467 420.4604187 422.0465698 422.9232178 423.2489624 423.5080872 423.4474182 423.8882751 424.4369812} {curve x1001 2480.484131 2480.521973 2480.337646 2480.781982 2481.621826 2481.488281 2482.346924 2482.585449 2482.409668 2481.927002 2480.109863 2474.816895 2468.961426 2466.800049 2465.316895 2466.145996 2473.727295 2486.893555 2501.083984 2511.984375 2519.149902 2520.357178 2518.585693 2519.4729 2523.05957 2528.507324 2535.125488 2539.56665 2541.57373 2538.905273 2534.310791 2530.015869 2532.0354 2542.617432 2553.332275 2558.448486 2559.334961 2558.262207 2554.210205 2553.020752 2556.523438 2559.218994 2559.418457 2557.051514 2553.502686 2550.960205 2549.554199 2551.255127 2554.306885 2555.175293 2551.564941 2547.643555 2546.46582 2547.014404 2547.667969 2548.710938 2548.442139 2547.01416 2546.514404 2547.047119 2546.88916 2546.513672 2545.005371 2541.802979 2539.793701 2541.276855 2544.876221 2547.360352 2547.306885 2545.811768 2545.824951 2547.209961 2550.026123 2555.608643 2560.642334 2560.64209 2557.758789 2557.083496 2557.935547 2559.077148 2560.597412} {curve K x1014 0} {curve K x1014 0} 1 0 0 {curve x1001 0.0002711116255 0.0003033569755 0.0002834289445 0.000312073445 0.0003813888214 0.0004908123141 0.0005661368555 0.0005724453884 0.0005803766993 0.0006544974367 0.0005984591239 0.0003841478486 9.96675267e-05 0 6.845779729e-05 0.0001280059291 6.016810438e-05 0.0001369778992 0.0005149760371 0.000784334578 0.0008024974439 0.000830805405 0.0009719749013 0.0009825186058 0.0007609932454 0.0006991929404 0.0007360338439 0.0006945103755 0.0005985734728 0.000534251514 0.000464234821 0.0009109689376 0.0007617799635 0.0006404014711 0.0005628567865 0.0006923889053 0.0007758495252 0.0008920767496 0.0008657063784 0.0008454873293 0.000856670842 0.0009198241073 0.0009195740757 0.0009065173691 0.0009140476312 0.0009123062108 0.000872893589 0.0008997938584 0.0009842312054 0.0008817175321 0.0008890844149 0.0009357272768 0.000967821338 0.0009810453916 0.0009405741275 0.0009887922003 3.719681885e-05 3.563263706e-05 4.634515055e-05 5.565429719e-05 3.60854467e-05 5.876206166e-05 4.006959592e-05 5.179441538e-05 5.246453038e-05 5.997516005e-05 6.223044438e-05 3.974235257e-05 4.594966712e-05 3.346935574e-05 4.168931542e-05 5.086352697e-05 4.513935626e-05 4.992969961e-05 4.320588828e-05 4.417121708e-05 5.028075231e-05 5.771851781e-05 6.11576038e-05 0.000113439177 0.0002303001424} 0 0.000988792 -21 -42 21 42 -14 -28 14 28 {curve} {curve x1014 343} {curve x1014 2397} {curve x1014 412} {curve x1014 2536} {curve x1014 357} {curve x1014 2425} {curve x1014 398} {curve x1014 2508} {curve x1014 20.1000061} {curve x1014 41.30004883}  } 
+ { {curve K x1014 1} "track 2" {curve x1001 801.6547241 803.0548096 803.5574341 804.2263184 805.2254639 804.7001343 805.0506592 804.9896851 804.7583008 804.3762817 804.2741699 804.265564 802.821106 802.0999756 802.0718994 803.6726685 807.7865601 812.3970337 815.8617554 821.4443359 830.430481 836.3582153 838.5263672 840.3320923 838.4813232 832.4472656 827.4619751 827.1577759 829.7592163 827.6772461 824.2988892 824.3747559 828.1185913 839.2678223 852.0927734 862.5481567 868.8363037 873.9039307 872.50354 866.1251831 862.6837769 859.9542236 858.3338013 859.286499 860.3630981 859.4888306 853.2196655 846.272583 842.0904541 844.3641357 848.831543 851.0946655 852.1938477 852.5048828 851.348999 849.7739868 848.2208252 846.5021973 846.3494263 847.399292 846.9130859 846.3161011 847.3931885 848.7649536 849.5343628 849.4505005 848.3227539 847.5128174 847.4002075 848.5363159 849.7753296 850.0377808 849.3111572 849.9483032 851.6434937 852.5853271 852.6912231 852.7624512 852.5623779 852.8104858 853.0679932} {curve x1001 2618.535156 2618.325439 2618.594482 2619.037109 2619.016602 2619.91333 2620.330078 2620.470215 2620.825684 2620.905762 2619.293213 2615.21167 2611.975586 2609.800049 2608.254639 2608.815186 2616.324219 2629.029785 2643.303223 2653.127686 2655.415771 2653.811035 2652.240967 2651.754639 2655.221924 2662.644043 2669.23584 2670.710205 2668.557129 2666.955078 2663.319824 2659.915527 2661.663818 2666.197754 2669.770752 2673.344482 2674.341553 2671.909424 2670.910645 2675.662842 2680.813477 2684.546143 2686.280273 2683.133545 2679.250488 2677.208496 2679.342529 2683.435303 2686.687012 2684.394531 2679.224365 2676.068359 2674.478271 2674.18042 2675.336182 2676.794922 2676.51123 2675.638672 2674.923584 2674.605957 2675.351807 2675.561768 2673.464111 2669.539551 2667.209229 2668.055664 2670.946045 2672.797119 2672.672607 2670.543701 2669.802246 2670.225586 2672.308594 2675.469238 2677.130859 2675.824707 2672.935791 2672.271973 2673.417725 2674.377197 2675.971436} {curve K x1014 0} {curve K x1014 0} 1 0 0 {curve x1001 4.39208188e-05 4.843953713e-05 4.332279484e-05 4.603540649e-05 5.082803773e-05 4.783233995e-05 4.714045741e-05 4.626785833e-05 4.614763959e-05 4.70353463e-05 4.531049188e-05 3.282955852e-05 2.152094769e-05 0 2.094844906e-05 2.720173533e-05 2.920799495e-05 3.76683661e-05 5.994385633e-05 0.0001250557713 0.0001689274349 0.0001852043219 0.000188112861 0.0002069850533 0.0002155583308 0.0002231120229 0.0002423029818 0.0003070887786 0.0003398466335 0.0003879159899 0.0003622319936 0.0002624276148 0.0002935598863 0.0005023127827 0.0007598214759 0.0007608411824 0.0008714409182 0.0009013624719 0.0008609426536 0.0008630477956 0.0008674900841 0.0008566747685 0.0009700809893 1.520761601e-05 1.602179217e-05 1.738880076e-05 4.605043829e-05 3.985824501e-05 4.675144335e-05 3.839961265e-05 3.182203065e-05 2.849968894e-05 2.150875964e-05 2.198117864e-05 2.421140015e-05 2.523398591e-05 2.47391033e-05 4.411990966e-05 0.0001011373747 0.0001394140665 0.0001513379227 0.0001625631302 0.0001553698719 0.000133976884 0.0001350483573 0.0001110627132 0.0001020965181 9.961152146e-05 9.822369388e-05 0.0001043333197 0.0001183841016 0.0001513992544 0.00020329267 0.000199260007 0.0002111288135 0.0002018741703 0.0002038285029 0.0002036699647 0.0002028101174 0.000202197378 0.0002281570482} 0 0.000970081 -21 -42 21 42 -14 -28 14 28 {curve} {curve x1014 767} {curve x1014 2540} {curve x1014 836} {curve x1014 2679} {curve x1014 781} {curve x1014 2568} {curve x1014 822} {curve x1014 2651} {curve x1014 20.59997559} {curve x1014 41.30004883}  } 
+ { {curve K x1014 1} "track 3" {curve x1001 995.7531128 996.5654297 997.4489136 997.9514771 998.2230225 998.5787964 998.4881592 998.6242065 999.0089722 999.4523315 999.9590454 1000.212158 1000.44873 999.7999878 999.437561 1001.03894 1004.84668 1009.50177 1014.142151 1018.272888 1021.431763 1024.510864 1026.568848 1025.92395 1022.922791 1018.573914 1013.874084 1010.450378 1008.353577 1007.294006 1007.362976 1010.261414 1013.503357 1016.973755 1022.043457 1028.210205 1032.759521 1035.182129 1035.71875 1034.704834 1032.737549 1031.696289 1031.558594 1032.199951 1033.374878 1033.183105 1030.929321 1026.95459 1023.615906 1023.378052 1026.428589 1029.346558 1029.820923 1029.227295 1028.756592 1028.032227 1027.008423 1026.111328 1025.949219 1026.406738 1026.85437 1027.038818 1027.500732 1028.419678 1028.881226 1028.079346 1026.473511 1025.200317 1025.222168 1025.931641 1026.044922 1025.299316 1024.181641 1022.779846 1021.54187 1021.138733 1021.800537 1022.411072 1022.78125 1023.606567 1025.418213} {curve x1001 667.3739624 666.9902344 667.762207 667.668396 667.6141357 668.5389404 668.5079956 668.9558716 669.3585205 669.6231689 668.4370117 667.347229 670.4294434 673 675.7336426 677.5462646 678.9443359 683.0119019 689.6990967 690.3271484 685.0336914 680.4121094 679.0930176 677.170105 678.8820801 685.1140137 688.4607544 684.6103516 678.508667 675.8341064 675.1834717 679.7869873 680.1350098 675.4216919 672.0273438 672.3520508 671.1732178 668.5839233 669.4586792 674.3632202 678.4846802 682.0811157 681.1919556 677.5709229 675.8451538 675.0738525 679.9418945 686.1766968 688.4478149 684.3604126 680.0567017 678.6349487 677.7071533 677.8318481 679.8270874 681.2363281 681.0224609 680.7133789 680.8353882 680.6821289 681.6409912 682.0904541 680.1000977 677.0100708 675.0741577 675.5371094 677.756958 678.3690796 677.6984863 675.8686523 674.788147 675.6142578 678.1234741 679.3364258 678.5544434 677.161438 676.4226074 677.9277344 680.5546265 682.7393799 685.6121826} {curve K x1014 0} {curve K x1014 0} 1 0 0 {curve x1001 4.113797564e-05 3.296560208e-05 3.197612776e-05 2.658288636e-05 2.989021669e-05 2.877605496e-05 2.979109236e-05 3.698115296e-05 3.36438042e-05 3.13978925e-05 3.722837789e-05 2.644088113e-05 1.485702225e-05 0 1.294378435e-05 1.740402907e-05 1.642854233e-05 2.924729886e-05 4.425139753e-05 9.14223739e-05 0.0002457334661 0.0003181869229 0.0003930998016 0.0004726308333 0.0006071498165 0.0006568823679 0.0005362445859 0.0002999027165 0.0001351822633 0.0001045137889 8.715258311e-05 0.0001110405702 0.0001480807585 0.0002369771377 0.0003475843499 0.0005199238626 0.0006812719929 0.000784036798 0.0009304277078 4.265021884e-05 5.658928597e-05 4.641895037e-05 8.770143233e-05 5.181903079e-05 1.822469498e-05 1.668103932e-05 3.716138245e-05 0.000117172962 0.0002127131391 0.0002590357343 0.0002283388294 0.0001694890415 0.0001812684204 0.000200463757 0.0002168319952 0.0002591697265 0.0003212003206 0.0004283187095 0.0004898478298 0.0005459133767 0.0005511681154 0.0005672929217 0.0005436765239 0.0005061967548 0.0004500264101 0.000442980633 0.000460233182 0.0004665310578 0.0004179975651 0.0003927130633 0.0002891282093 0.0001538306209 0.0001865879533 0.0003430757249 0.0002227651796 0.0002145259982 0.0004109895615 0.0006421666321 0.0008548529535 0.0007587631333 0.0006016878212} 0 0.000930428 -32 -44.5 32 44.5 -14 -28 14 28 {curve} {curve x1014 954} {curve x1014 600} {curve x1014 1045} {curve x1014 744} {curve x1014 968} {curve x1014 628} {curve x1014 1031} {curve x1014 716} {curve x1014 31.29998779} {curve x1014 44.5}  } 
+} 
+}
+
+reference_frame 1001
+translate {{curve x1001 0 1.220397949 1.834594727 2.451843262 3.198852539 2.959228516 3.16229248 3.186279297 3.146728516 3.061279297 3.208496094 3.291687012 2.502868652 1.893737793 1.795776367 3.396362305 7.207397461 11.62341309 15.3104248 20.21801758 26.97229004 31.83728027 33.95812988 34.82714844 32.46789551 26.88720703 21.94873047 20.4753418 21.39868164 19.67565918 17.68896484 18.98773193 22.50830078 30.77001953 40.9720459 49.44970703 55.00769043 59.1517334 58.35571289 53.76385498 50.82800293 48.66455078 47.54296875 48.43688965 49.62451172 49.03417969 44.2008667 38.3661499 34.54846191 35.94030762 39.90869141 42.45159912 43.38562012 43.37762451 42.46893311 41.27148438 39.93475342 38.51306152 38.38549805 39.26330566 39.09313965 38.81433105 39.67150879 40.94299316 41.61834717 41.28503418 39.97601318 38.99169922 38.91796875 39.94824219 40.78125 40.69628906 39.86022949 39.78991699 40.47106934 40.94281006 41.30731201 41.62097168 41.65740967 42.16210938 43.03485107} {curve x1001 0 -0.1853027344 0.1002197266 0.3647460938 0.6197509766 1.182250977 1.596923828 1.872680664 2.066650391 2.020751953 0.4821777344 -3.006103516 -5.009155273 -5.597900391 -5.696289063 -4.62878418 0.8674316406 10.84716797 22.56420898 29.68188477 31.06848145 29.39550781 27.84204102 27.33459473 30.25646973 36.62402344 42.14282227 42.83117676 40.74865723 38.43359375 35.47363281 34.44165039 35.81347656 39.28125 42.91223145 45.91711426 46.15209961 44.12072754 42.7286377 45.55102539 49.80932617 53.15087891 53.49902344 50.45410156 47.40148926 45.61633301 47.48156738 51.49121094 54.34936523 52.51220703 48.15063477 45.31762695 44.0859375 44.21105957 45.47912598 46.78283691 46.52734375 45.6574707 45.29321289 45.31396484 45.82958984 45.9239502 44.05871582 40.65307617 38.56115723 39.49194336 42.3951416 44.04418945 43.76135254 41.94348145 41.3404541 42.21875 44.68823242 48.00695801 49.97814941 49.07824707 46.90783691 46.96313477 48.50488281 49.93322754 51.92919922}}
+center {{curve x1001 724.6062622 724.6062622 724.6062622 724.6062622 724.6062622 724.6062622 724.6062622 724.6062622 724.6062622 724.6062622 724.6062622 724.6062622 724.6062622 724.6062622 724.6062622 724.6062622 724.6062622 724.6062622 724.6062622 724.6062622 724.6062622 724.6062622 724.6062622 724.6062622 724.6062622 724.6062622 724.6062622 724.6062622 724.6062622 724.6062622 724.6062622 724.6062622 724.6062622 724.6062622 724.6062622 724.6062622 724.6062622 724.6062622 724.6062622 724.6062622 724.6062622 724.6062622 724.6062622 724.6062622 724.6062622 724.6062622 724.6062622 724.6062622 724.6062622 724.6062622 724.6062622 724.6062622 724.6062622 724.6062622 724.6062622 724.6062622 724.6062622 724.6062622 724.6062622 724.6062622 724.6062622 724.6062622 724.6062622 724.6062622 724.6062622 724.6062622 724.6062622 724.6062622 724.6062622 724.6062622 724.6062622 724.6062622 724.6062622 724.6062622 724.6062622 724.6062622 724.6062622 724.6062622 724.6062622 724.6062622 724.6062622} {curve x1001 1922.131226 1922.131226 1922.131226 1922.131226 1922.131226 1922.131226 1922.131226 1922.131226 1922.131226 1922.131226 1922.131226 1922.131226 1922.131226 1922.131226 1922.131226 1922.131226 1922.131226 1922.131226 1922.131226 1922.131226 1922.131226 1922.131226 1922.131226 1922.131226 1922.131226 1922.131226 1922.131226 1922.131226 1922.131226 1922.131226 1922.131226 1922.131226 1922.131226 1922.131226 1922.131226 1922.131226 1922.131226 1922.131226 1922.131226 1922.131226 1922.131226 1922.131226 1922.131226 1922.131226 1922.131226 1922.131226 1922.131226 1922.131226 1922.131226 1922.131226 1922.131226 1922.131226 1922.131226 1922.131226 1922.131226 1922.131226 1922.131226 1922.131226 1922.131226 1922.131226 1922.131226 1922.131226 1922.131226 1922.131226 1922.131226 1922.131226 1922.131226 1922.131226 1922.131226 1922.131226 1922.131226 1922.131226 1922.131226 1922.131226 1922.131226 1922.131226 1922.131226 1922.131226 1922.131226 1922.131226 1922.131226}}
+shutteroffset centred
+name ThreePointCornerPinTracker1
+label "Motion: \[value transform]\nRef frame: \[value reference_frame]"
+selected true
+xpos 0
+ypos 64
+addUserKnob {20 button +HIDDEN +INVISIBLE}
+addUserKnob {22 createPPinUseCurrentFrameBaked -STARTLINE T "import aePowerPinFun\naePowerPinFun.createPPinUseReferenceFrameBaked()"}
+addUserKnob {22 createPPinUseReferenceFrameBaked -STARTLINE T "import aePowerPinFun\naePowerPinFun.createPPinUseReferenceFrameBaked()"}
+addUserKnob {20 button_1 l button +HIDDEN +INVISIBLE}
+addUserKnob {22 createPPinUseCurrentFrameBaked_1 l createPPinUseCurrentFrameBaked -STARTLINE T "import aePowerPinFun\naePowerPinFun.createPPinUseReferenceFrameBaked()"}
+addUserKnob {22 createPPinUseReferenceFrameBaked_1 l createPPinUseReferenceFrameBaked -STARTLINE T "import aePowerPinFun\naePowerPinFun.createPPinUseReferenceFrameBaked()"}
+addUserKnob {20 button_2 l button +HIDDEN +INVISIBLE}
+addUserKnob {22 createPPinUseCurrentFrameBaked_2 l createPPinUseCurrentFrameBaked -STARTLINE T "import aePowerPinFun\naePowerPinFun.createPPinUseReferenceFrameBaked()"}
+addUserKnob {22 createPPinUseReferenceFrameBaked_2 l createPPinUseReferenceFrameBaked -STARTLINE T "import aePowerPinFun\naePowerPinFun.createPPinUseReferenceFrameBaked()"}
+addUserKnob {20 button_3 l button +HIDDEN +INVISIBLE}
+addUserKnob {22 createPPinUseCurrentFrameBaked_3 l createPPinUseCurrentFrameBaked -STARTLINE T "import aePowerPinFun\naePowerPinFun.createPPinUseReferenceFrameBaked()"}
+addUserKnob {22 createPPinUseReferenceFrameBaked_3 l createPPinUseReferenceFrameBaked -STARTLINE T "import aePowerPinFun\naePowerPinFun.createPPinUseReferenceFrameBaked()"}
+addUserKnob {20 button_4 l button +HIDDEN +INVISIBLE}
+addUserKnob {22 createPPinUseCurrentFrameBaked_4 l createPPinUseCurrentFrameBaked -STARTLINE T "import aePowerPinFun\naePowerPinFun.createPPinUseReferenceFrameBaked()"}
+addUserKnob {22 createPPinUseReferenceFrameBaked_4 l createPPinUseReferenceFrameBaked -STARTLINE T "import aePowerPinFun\naePowerPinFun.createPPinUseReferenceFrameBaked()"}
+addUserKnob {20 button_5 l button +HIDDEN +INVISIBLE}
+addUserKnob {22 createPPinUseCurrentFrameBaked_5 l createPPinUseCurrentFrameBaked -STARTLINE T "import aePowerPinFun\naePowerPinFun.createPPinUseReferenceFrameBaked()"}
+addUserKnob {22 createPPinUseReferenceFrameBaked_5 l createPPinUseReferenceFrameBaked -STARTLINE T "import aePowerPinFun\naePowerPinFun.createPPinUseReferenceFrameBaked()"}
+addUserKnob {20 button_6 l button +HIDDEN +INVISIBLE}
+addUserKnob {22 createPPinUseCurrentFrameBaked_6 l createPPinUseCurrentFrameBaked -STARTLINE T "import aePowerPinFun\naePowerPinFun.createPPinUseReferenceFrameBaked()"}
+addUserKnob {22 createPPinUseReferenceFrameBaked_6 l createPPinUseReferenceFrameBaked -STARTLINE T "import aePowerPinFun\naePowerPinFun.createPPinUseReferenceFrameBaked()"}
+addUserKnob {20 button_7 l button +HIDDEN +INVISIBLE}
+addUserKnob {22 createPPinUseCurrentFrameBaked_7 l createPPinUseCurrentFrameBaked -STARTLINE T "import aePowerPinFun\naePowerPinFun.createPPinUseReferenceFrameBaked()"}
+addUserKnob {22 createPPinUseReferenceFrameBaked_7 l createPPinUseReferenceFrameBaked -STARTLINE T "import aePowerPinFun\naePowerPinFun.createPPinUseReferenceFrameBaked()"}
+addUserKnob {20 button +HIDDEN +INVISIBLE}
+addUserKnob {22 createPPinUseCurrentFrameBaked -STARTLINE T "import aePowerPinFun\naePowerPinFun.createPPinUseReferenceFrameBaked()"}
+addUserKnob {22 createPPinUseReferenceFrameBaked -STARTLINE T "import aePowerPinFun\naePowerPinFun.createPPinUseReferenceFrameBaked()"}
+}
+Output {
+name Output1
+xpos 0
+ypos 300
+}
+end_group
