@@ -1,0 +1,132 @@
+#! /Volumes/Infra/packages/software/nuke/13.2.8-0/platform-linux/arch-x86_64/src/libnuke-13.2.8.so -nx
+version 13.2 v8
+Gizmo {
+ tile_color 0xff5f00ff
+ note_font "Segoe UI Black"
+ addUserKnob {20 hacker_truki_kronos l Kronos}
+ addUserKnob {85 kronos_selector l Selector M {"NO Kronos in nodegraph! :(" "" "Here Kronos' nodes will appear!"}}
+ kronos_selector "Here Kronos' nodes will appear!"
+ addUserKnob {22 kronos_auto_search l "Search Again" -STARTLINE T "import nuke\n\nthis_node = nuke.thisNode()\nthis_knob = nuke.thisKnob()\nnodeList = \[]\n\nwith nuke.root():\n       \n    for node in nuke.allNodes():\n        nodeClass = node.Class()\n        if nodeClass.__contains__(\"Kronos\"):\n            nodeList.append(node.knob('name').getValue())\n    \n    if nodeList:\n        nodeList.sort()\n    else: \n        nuke.message(\"There wasn't a Kronos node in the nodegraph!\")\n        nodeList.append(\"NO Kronos in nodegraph! :(\")\n\nthis_node.knob('kronos_selector').setValues(nodeList)\nthis_node.knob('kronos_auto_search').setLabel('Search Again')"}
+ addUserKnob {22 kronos_link l "Kronos Link" -STARTLINE T "import nuke\n\nthis_node = nuke.thisNode()\nthis_node_name = this_node.knob('name').getValue()\nkronos = nuke.toNode(this_node.knob('kronos_selector').value())\n\nkronos\['input.first'].setExpression(this_node_name  + '.kronos_input_first')\nkronos\['input.last'].setExpression(this_node_name  + '.kronos_input_last')\nkronos\['retimedChannels'].setExpression(this_node_name  + '.kronos_channels')\nkronos\['interpolation'].setExpression(this_node_name  + '.kronos_method')\nkronos\['timing2'].setExpression(this_node_name  + '.kronos_timing')\n\nif this_node.knob('kronos_timing').value() == 'Output Speed':\n    kronos\['timingOutputSpeed'].setExpression(this_node_name  + '.kronos_timing_value')\nelif this_node.knob('kronos_timing').value() == 'Input Speed':\n    kronos\['timingInputSpeed'].setExpression(this_node_name  + '.kronos_timing_value')\nelif this_node.knob('kronos_timing').value() == 'Frame':\n    kronos\['timingFrame2'].setExpression(this_node_name  + '.kronos_timing_value')"}
+ addUserKnob {22 kronos_unlink l "Kronos Unlink" -STARTLINE T "import nuke\n\nthis_node = nuke.thisNode()\nthis_node_name = this_node.knob('name').getValue()\nkronos = nuke.toNode(this_node.knob('kronos_selector').value())\n\nkronos\['input.first'].setExpression('')\nkronos\['input.last'].setExpression('')\nkronos\['retimedChannels'].setExpression('')\nkronos\['interpolation'].setExpression('')\nkronos\['timing2'].setExpression('')\n\nif this_node.knob('kronos_timing').value() == 'Output Speed':\n    kronos\['timingOutputSpeed'].setExpression('')\nelif this_node.knob('kronos_timing').value() == 'Input Speed':\n    kronos\['timingInputSpeed'].setExpression('')\nelif this_node.knob('kronos_timing').value() == 'Frame':\n    kronos\['timingFrame2'].setExpression('')"}
+ addUserKnob {26 kronos_selector_separator l "" +STARTLINE}
+ addUserKnob {3 kronos_input_first l "Input Range"}
+ kronos_input_first 1001
+ addUserKnob {3 kronos_input_last l "" -STARTLINE}
+ kronos_input_last 1999
+ addUserKnob {22 kronos_reset l Reset -STARTLINE T "import nuke\n\nthis_node = nuke.thisNode()\nthis_node\['kronos_input_first'].setValue(nuke.root().firstFrame())\nthis_node\['kronos_input_last'].setValue(nuke.root().lastFrame())"}
+ addUserKnob {10 kronos_channels l Channels}
+ addUserKnob {4 kronos_method l Method M {Frame Blend Motion "" "" "" ""}}
+ kronos_method Motion
+ addUserKnob {6 color_rgba_panelDropped l "panel dropped state" +HIDDEN +STARTLINE}
+ addUserKnob {4 kronos_timing l Timing M {"Output Speed" "Input Speed" Frame "" ""}}
+ addUserKnob {7 kronos_timing_value l "Timing Value" R 0 5}
+ kronos_timing_value 0.5
+ addUserKnob {4 kronos_motion l Motion +INVISIBLE M {Regularized Local ""}}
+ addUserKnob {7 kronos_vector_detail l "Vector Detail" +INVISIBLE}
+ kronos_vector_detail 0.3
+ addUserKnob {7 kronos_strength l Strength +INVISIBLE R 0 1.5}
+ kronos_strength 1.5
+ addUserKnob {4 kronos_resampling l Resampling +INVISIBLE M {Bilinear Lanczos4 Lanczos6}}
+ addUserKnob {20 kronos_shutter l Shutter +INVISIBLE n 1}
+ kronos_shutter 0
+ addUserKnob {3 kronos_shutter_samples l "Shutter Samples"}
+ kronos_shutter_samples 1
+ addUserKnob {7 kronos_shutter_time l "Shutter Time" R 0 10}
+ addUserKnob {6 kronos_automatic_shutter_time l "Automatic Shutter Time" +STARTLINE}
+ addUserKnob {20 endGroup n -1}
+ addUserKnob {4 kronos_output l Output +INVISIBLE M {Result Matte Foreground Background "" "" ""}}
+ addUserKnob {4 kronos_matte_channel l "Matte Channel" +INVISIBLE M {None "Source Alpha" "Source Inverted Alpha" "Matte Luminance" "Matte Inverted Luminance" "Matte Alpha" "Matte Inverted Alpha" "" ""}}
+ addUserKnob {20 kronos_advanced l Advanced +INVISIBLE n 1}
+ kronos_advanced 0
+ addUserKnob {6 kronos_flicker_compensation l "Flicker Compensation" +STARTLINE}
+ addUserKnob {20 krnos_tolerances l Tolerances n 1}
+ addUserKnob {7 kronos_weight_red l "Weight Red"}
+ kronos_weight_red 0.3
+ addUserKnob {7 kronos_weight_green l "Weight Green"}
+ kronos_weight_green 0.6
+ addUserKnob {7 kronos_weight_blue l "Weight Blue"}
+ kronos_weight_blue 0.1
+ addUserKnob {3 kronos_vector_spacing l "Vector Spacing"}
+ kronos_vector_spacing 20
+ addUserKnob {6 kronos_overlay_vectors l "Overlay Vectors" -STARTLINE}
+ addUserKnob {20 endGroup_2 l endGroup n -1}
+ addUserKnob {20 endGroup_1 l endGroup n -1}
+ addUserKnob {26 kronos_nameSeparator l "" +STARTLINE}
+ addUserKnob {26 kronos_nodeName l "" +STARTLINE T " <b>lpHackerTruki v1.0</b>"}
+ addUserKnob {26 kronos_copyName l "" +STARTLINE T "David Lozano Pascual ©"}
+ addUserKnob {20 hacker_truki_smart_vector l SmartVector}
+ addUserKnob {85 smart_vector_selector l Selector M {"Here Smart Vector's nodes will appear!"}}
+ addUserKnob {22 smart_vector_search l Search -STARTLINE T "import nuke\n\nthis_node = nuke.thisNode()\nthis_knob = nuke.thisKnob()\nnodeList = \[]\n\nwith nuke.root():\n       \n    for node in nuke.allNodes():\n        nodeClass = node.Class()\n        if nodeClass.__contains__(\"SmartVector\"):\n            nodeList.append(node.knob('name').getValue())\n    \n    if nodeList:\n        nodeList.sort()\n    else: \n        nuke.message(\"There wasn't a SmartVector node in the nodegraph!\")\n        nodeList.append(\"NO SmartVector in nodegraph! :(\")\n\nthis_node.knob('smart_vector_selector').setValues(nodeList)\nthis_node.knob('smart_vector_search').setLabel('Search Again')"}
+ addUserKnob {22 smart_vector_link l "SmartVector Link" -STARTLINE T "this_node = nuke.thisNode()\nthis_node_name = this_node.knob('name').getValue()\nsmart_vector = nuke.toNode(this_node.knob('smart_vector_selector').value())\n\nsmart_vector\['renderMaxFrameDistance'].setExpression(this_node_name  + '.smart_vector_frame_distance')\nsmart_vector\['vectorDetailReg'].setExpression(this_node_name  + '.smart_vector_vector_detail')\nsmart_vector\['strengthReg'].setExpression(this_node_name  + '.smart_vector_strength')\nsmart_vector\['matteChannel'].setExpression(this_node_name  + '.smart_vector_matte_channel')\nsmart_vector\['inpainting'].setExpression(this_node_name  + '.smart_vector_inpaint_matte_region')\nsmart_vector\['matteDilation'].setExpression(this_node_name  + '.smart_vector_matte_dilation')\n\nsmart_vector\['flickerCompensation'].setExpression(this_node_name  + '.smart_vector_flicker_compensation')\n\nsmart_vector\['weightRed'].setExpression(this_node_name  + '.smart_vector_weight_red')\nsmart_vector\['weightGreen'].setExpression(this_node_name  + '.smart_vector_weight_green')\nsmart_vector\['weightBlue'].setExpression(this_node_name  + '.smart_vector_weight_blue')"}
+ addUserKnob {22 smart_vector_unlink l "SmartVector Unlink" -STARTLINE T "this_node = nuke.thisNode()\nthis_node_name = this_node.knob('name').getValue()\nsmart_vector = nuke.toNode(this_node.knob('smart_vector_selector').value())\n\nsmart_vector\['renderMaxFrameDistance'].setExpression('')\nsmart_vector\['vectorDetailReg'].setExpression('')\nsmart_vector\['strengthReg'].setExpression('')\nsmart_vector\['matteChannel'].setExpression('')\nsmart_vector\['inpainting'].setExpression('')\nsmart_vector\['matteDilation'].setExpression('')\n\nsmart_vector\['flickerCompensation'].setExpression('')\n\nsmart_vector\['weightRed'].setExpression('')\nsmart_vector\['weightGreen'].setExpression('')\nsmart_vector\['weightBlue'].setExpression('')"}
+ addUserKnob {26 smart_vector_selector_separator l "" +STARTLINE}
+ addUserKnob {7 smart_vector_frame_distance l "Frame Distance" R 0 6}
+ smart_vector_frame_distance 6
+ addUserKnob {7 smart_vector_vector_detail l "Vector Detail"}
+ smart_vector_vector_detail 0.3
+ addUserKnob {7 smart_vector_strength l Strength R 0 1.5}
+ smart_vector_strength 1.5
+ addUserKnob {4 smart_vector_matte_channel l "Matte Channel" M {None "Source Alpha" "Source Inverted Alpha" "Matte Luminance" "Matte Inverted Luminance" "Matte Alpha" "Matte Inverted Alpha" "" ""}}
+ addUserKnob {6 smart_vector_inpaint_matte_region l "Inpaint Matte Region" +STARTLINE}
+ addUserKnob {7 smart_vector_matte_dilation l "Matte Dilation" R 0 100}
+ smart_vector_matte_dilation 50
+ addUserKnob {26 samrt_vector_export_separator l Export}
+ addUserKnob {22 smart_vector_export_write l "Export Write" T "this_node = nuke.thisNode()\nthis_node_name = this_node.knob('name').getValue()\nsmart_vector = nuke.toNode(this_node.knob('smart_vector_selector').value())\n\nsmart_vector\['exportWrite'].execute()" +STARTLINE}
+ addUserKnob {20 smart_vector_advanced l Advanced n 1}
+ smart_vector_advanced 0
+ addUserKnob {6 smart_vector_flicker_compensation l "Flicker Compensation" +STARTLINE}
+ addUserKnob {20 smart_vector_tolerances l Tolerances n 1}
+ smart_vector_tolerances 0
+ addUserKnob {7 smart_vector_weight_red l "Weight Red"}
+ smart_vector_weight_red 0.3
+ addUserKnob {7 smart_vector_weight_green l "Weight Green"}
+ smart_vector_weight_green 0.6
+ addUserKnob {7 smart_vector_weight_blue l "Weight Blue"}
+ smart_vector_weight_blue 0.1
+ addUserKnob {20 endGroup_4 l endGroup n -1}
+ addUserKnob {20 endGroup_3 l endGroup n -1}
+ addUserKnob {26 smart_vector_nameSeparator l "" +STARTLINE}
+ addUserKnob {26 smart_vector_nodeName l "" +STARTLINE T " <b>lpHackerTruki v0.1</b>"}
+ addUserKnob {26 smart_vector_copyName l "" +STARTLINE T "David Lozano Pascual ©"}
+ addUserKnob {20 hacker_truki_vector_generator l VectorGenerator}
+ addUserKnob {85 vector_generator_selector l Selector M {"Here Vector Generator's nodes will appear!"}}
+ addUserKnob {22 vector_generator_search l Search -STARTLINE T "import nuke\n\nthis_node = nuke.thisNode()\nthis_knob = nuke.thisKnob()\nnodeList = \[]\n\nwith nuke.root():\n       \n    for node in nuke.allNodes():\n        nodeClass = node.Class()\n        if nodeClass.__contains__(\"VectorGenerator\"):\n            nodeList.append(node.knob('name').getValue())\n    \n    if nodeList:\n        nodeList.sort()\n    else: \n        nuke.message(\"There wasn't a VectorGenerator node in the nodegraph!\")\n        nodeList.append(\"NO VectorGenerator in nodegraph! :(\")\n\nthis_node.knob('vector_generator_selector').setValues(nodeList)\nthis_node.knob('vector_generator_search').setLabel('Search Again')"}
+ addUserKnob {22 vector_generator_link l "VectorGenerator Link" -STARTLINE T "this_node = nuke.thisNode()\nthis_node_name = this_node.knob('name').getValue()\nvector_generator = nuke.toNode(this_node.knob('vector_generator_selector').value())\n\nvector_generator \['motionEstimation'].setExpression(this_node_name  + '.vector_generator_motion')\nvector_generator \['vectorDetailReg'].setExpression(this_node_name  + '.vector_generator_vector_detail')\nvector_generator \['strengthReg'].setExpression(this_node_name  + '.vector_generator_strength_smoothness')\n# vector_generator \['vectorDetailLocal'].setExpression(this_node_name  + '.vector_generator_vector_detail')\n# vector_generator \['strengthLocal'].setExpression(this_node_name  + '.vector_generator_strength_smoothness')\n\nvector_generator\['matteChannel'].setExpression(this_node_name  + '.vector_generator_matte_channel')\nvector_generator\['output'].setExpression(this_node_name  + '.vector_generator_output')\n\nvector_generator\['flickerCompensation'].setExpression(this_node_name  + '.vector_generator_flicker_compensation')\n\nvector_generator\['weightRed'].setExpression(this_node_name  + '.vector_generator_weight_red')\nvector_generator\['weightGreen'].setExpression(this_node_name  + '.vector_generator_weight_green')\nvector_generator\['weightBlue'].setExpression(this_node_name  + '.vector_generator_weight_blue')"}
+ addUserKnob {22 vector_generator_unlink l "VectorGenerator Unlink" -STARTLINE T "this_node = nuke.thisNode()\nthis_node_name = this_node.knob('name').getValue()\nvector_generator = nuke.toNode(this_node.knob('vector_generator_selector').value())\n\nvector_generator \['motionEstimation'].setExpression('')\nvector_generator \['vectorDetailReg'].setExpression('')\nvector_generator \['strengthReg'].setExpression('')\n\nvector_generator\['matteChannel'].setExpression('')\nvector_generator\['output'].setExpression('')\n\nvector_generator\['flickerCompensation'].setExpression('')\n\nvector_generator\['weightRed'].setExpression('')\nvector_generator\['weightGreen'].setExpression('')\nvector_generator\['weightBlue'].setExpression('')"}
+ addUserKnob {26 vector_generator_selector_separator l "" +STARTLINE}
+ addUserKnob {4 vector_generator_motion l Motion M {Regularized Local "" ""}}
+ addUserKnob {7 vector_generator_vector_detail l "Vector Detail"}
+ vector_generator_vector_detail 0.3
+ addUserKnob {7 vector_generator_strength_smoothness l Strength R 0 1.5}
+ vector_generator_strength_smoothness 1.5
+ addUserKnob {4 vector_generator_matte_channel l "Matte Channel" M {None "Source Alpha" "Source Inverted Alpha" "Matte Luminance" "Matte Inverted Luminance" "Matte Alpha" "Matte Inverted Alpha" "" ""}}
+ addUserKnob {4 vector_generator_output l Output M {Foreground Background "" "" ""}}
+ addUserKnob {20 vector_generator_advanced l Advanced n 1}
+ vector_generator_advanced 0
+ addUserKnob {6 vector_generator_flicker_compensation l "Flicker Compensation" +STARTLINE}
+ addUserKnob {20 vector_generator_tolerances l Tolerances n 1}
+ vector_generator_tolerances 0
+ addUserKnob {7 vector_generator_weight_red l "Weight Red"}
+ vector_generator_weight_red 0.3
+ addUserKnob {7 vector_generator_weight_green l "Weight Green"}
+ vector_generator_weight_green 0.6
+ addUserKnob {7 vector_generator_weight_blue l "Weight Blue"}
+ vector_generator_weight_blue 0.1
+ addUserKnob {20 endGroup_6 l endGroup n -1}
+ addUserKnob {20 endGroup_5 l endGroup n -1}
+ addUserKnob {26 vector_generator_nameSeparator l "" +STARTLINE}
+ addUserKnob {26 vector_generator_nodeName l "" +STARTLINE T "<b>lpHackerTruki v0.1</b>"}
+ addUserKnob {26 vector_generator_copyName l "" +STARTLINE T "David Lozano Pascual ©"}
+}
+ Input {
+  inputs 0
+  name src
+  xpos 0
+ }
+ Output {
+  name Output1
+  xpos -76
+  ypos 294
+ }
+end_group
